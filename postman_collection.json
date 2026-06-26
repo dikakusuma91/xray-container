@@ -1,0 +1,362 @@
+{
+  "info": {
+    "name": "X-Ray Container Scan API",
+    "description": "Collection untuk testing endpoint auth, pemindaian X-Ray, dan dashboard.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8181",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "email",
+      "value": "tester@example.com",
+      "type": "string"
+    },
+    {
+      "key": "password",
+      "value": "12345678",
+      "type": "string"
+    },
+    {
+      "key": "nama_lengkap",
+      "value": "Tester API",
+      "type": "string"
+    },
+    {
+      "key": "scan_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"kata_sandi\": \"{{password}}\",\n  \"nama_lengkap\": \"{{nama_lengkap}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/daftar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "daftar"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (pm.response.code === 201 && jsonData.token) {",
+                  "  pm.environment.set('token', jsonData.token);",
+                  "  if (jsonData.pengguna && jsonData.pengguna.id) {",
+                  "    pm.environment.set('user_id', jsonData.pengguna.id);",
+                  "  }",
+                  "}",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"kata_sandi\": \"{{password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/masuk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "masuk"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (pm.response.code === 200 && jsonData.token) {",
+                  "  pm.environment.set('token', jsonData.token);",
+                  "}",
+                  ""
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pemindaian X-Ray",
+      "item": [
+        {
+          "name": "Get All Scans",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/pemindaian-xray",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pemindaian-xray"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Scan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "nama_image",
+                  "value": "nginx:latest",
+                  "type": "text"
+                },
+                {
+                  "key": "tanggal_pemindaian",
+                  "value": "2026-06-26T10:00:00Z",
+                  "type": "text"
+                },
+                {
+                  "key": "deskripsi",
+                  "value": "Pemindaian awal untuk image nginx",
+                  "type": "text"
+                },
+                {
+                  "key": "laporan",
+                  "value": "Tidak ada temuan kritis",
+                  "type": "text"
+                },
+                {
+                  "key": "gambar",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/pemindaian-xray",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pemindaian-xray"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (pm.response.code === 201 && jsonData.id) {",
+                  "  pm.environment.set('scan_id', jsonData.id);",
+                  "}",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Scan by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/pemindaian-xray/{{scan_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pemindaian-xray",
+                "{{scan_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Scan",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "nama_image",
+                  "value": "nginx:1.27-alpine",
+                  "type": "text"
+                },
+                {
+                  "key": "tanggal_pemindaian",
+                  "value": "2026-06-26T11:30:00Z",
+                  "type": "text"
+                },
+                {
+                  "key": "deskripsi",
+                  "value": "Pemindaian diperbarui",
+                  "type": "text"
+                },
+                {
+                  "key": "laporan",
+                  "value": "Ada 1 temuan sedang",
+                  "type": "text"
+                },
+                {
+                  "key": "gambar",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/pemindaian-xray/{{scan_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pemindaian-xray",
+                "{{scan_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Scan",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/pemindaian-xray/{{scan_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pemindaian-xray",
+                "{{scan_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/dasbor/ringkasan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dasbor",
+                "ringkasan"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
