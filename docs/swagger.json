@@ -1,0 +1,448 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API untuk mengelola hasil pemindaian container X-Ray",
+        "title": "X-Ray Container Scan API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8181",
+    "basePath": "/",
+    "paths": {
+        "/api/v1/auth/daftar": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Daftar pengguna baru",
+                "parameters": [
+                    {
+                        "description": "Data pendaftaran",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.PermintaanDaftar"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/masuk": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Masuk dan dapatkan token JWT",
+                "parameters": [
+                    {
+                        "description": "Data login",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.PermintaanMasuk"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/pemindaian-xray": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PemindaianXray"
+                ],
+                "summary": "Ambil semua pemindaian xray",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.PemindaianXray"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PemindaianXray"
+                ],
+                "summary": "Buat pemindaian xray baru",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Nama image container",
+                        "name": "nama_image",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Tanggal pemindaian (RFC3339)",
+                        "name": "tanggal_pemindaian",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Deskripsi",
+                        "name": "deskripsi",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Laporan hasil pemindaian",
+                        "name": "laporan",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "File gambar hasil scan",
+                        "name": "gambar",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.PemindaianXray"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/pemindaian-xray/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PemindaianXray"
+                ],
+                "summary": "Ambil pemindaian xray berdasarkan ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID Pemindaian",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.PemindaianXray"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PemindaianXray"
+                ],
+                "summary": "Perbarui pemindaian xray",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID Pemindaian",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Nama image container",
+                        "name": "nama_image",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Tanggal pemindaian (RFC3339)",
+                        "name": "tanggal_pemindaian",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Deskripsi",
+                        "name": "deskripsi",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Laporan hasil pemindaian",
+                        "name": "laporan",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "File gambar hasil scan",
+                        "name": "gambar",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.PemindaianXray"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PemindaianXray"
+                ],
+                "summary": "Hapus pemindaian xray",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID Pemindaian",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "controllers.PermintaanDaftar": {
+            "type": "object",
+            "required": [
+                "email",
+                "kata_sandi",
+                "nama_lengkap"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "kata_sandi": {
+                    "type": "string",
+                    "minLength": 6
+                },
+                "nama_lengkap": {
+                    "type": "string"
+                }
+            }
+        },
+        "controllers.PermintaanMasuk": {
+            "type": "object",
+            "required": [
+                "email",
+                "kata_sandi"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "kata_sandi": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.PemindaianXray": {
+            "type": "object",
+            "properties": {
+                "deskripsi": {
+                    "type": "string"
+                },
+                "dibuat_pada": {
+                    "type": "string"
+                },
+                "diperbarui_pada": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "id_pengguna": {
+                    "type": "string"
+                },
+                "laporan": {
+                    "type": "string"
+                },
+                "nama_image": {
+                    "type": "string"
+                },
+                "path_gambar": {
+                    "type": "string"
+                },
+                "prioritas": {
+                    "type": "string"
+                },
+                "tanggal_pemindaian": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

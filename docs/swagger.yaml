@@ -1,0 +1,289 @@
+basePath: /
+definitions:
+  controllers.PermintaanDaftar:
+    properties:
+      email:
+        type: string
+      kata_sandi:
+        minLength: 6
+        type: string
+      nama_lengkap:
+        type: string
+    required:
+    - email
+    - kata_sandi
+    - nama_lengkap
+    type: object
+  controllers.PermintaanMasuk:
+    properties:
+      email:
+        type: string
+      kata_sandi:
+        type: string
+    required:
+    - email
+    - kata_sandi
+    type: object
+  models.PemindaianXray:
+    properties:
+      deskripsi:
+        type: string
+      dibuat_pada:
+        type: string
+      diperbarui_pada:
+        type: string
+      id:
+        type: string
+      id_pengguna:
+        type: string
+      laporan:
+        type: string
+      nama_image:
+        type: string
+      path_gambar:
+        type: string
+      prioritas:
+        type: string
+      tanggal_pemindaian:
+        type: string
+    type: object
+host: localhost:8181
+info:
+  contact: {}
+  description: API untuk mengelola hasil pemindaian container X-Ray
+  title: X-Ray Container Scan API
+  version: "1.0"
+paths:
+  /api/v1/auth/daftar:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data pendaftaran
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.PermintaanDaftar'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Daftar pengguna baru
+      tags:
+      - Auth
+  /api/v1/auth/masuk:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data login
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.PermintaanMasuk'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Masuk dan dapatkan token JWT
+      tags:
+      - Auth
+  /api/v1/pemindaian-xray:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.PemindaianXray'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil semua pemindaian xray
+      tags:
+      - PemindaianXray
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Nama image container
+        in: formData
+        name: nama_image
+        required: true
+        type: string
+      - description: Tanggal pemindaian (RFC3339)
+        in: formData
+        name: tanggal_pemindaian
+        type: string
+      - description: Deskripsi
+        in: formData
+        name: deskripsi
+        type: string
+      - description: Laporan hasil pemindaian
+        in: formData
+        name: laporan
+        type: string
+      - description: File gambar hasil scan
+        in: formData
+        name: gambar
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.PemindaianXray'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Buat pemindaian xray baru
+      tags:
+      - PemindaianXray
+  /api/v1/pemindaian-xray/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID Pemindaian
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Hapus pemindaian xray
+      tags:
+      - PemindaianXray
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID Pemindaian
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PemindaianXray'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil pemindaian xray berdasarkan ID
+      tags:
+      - PemindaianXray
+    put:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: ID Pemindaian
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Nama image container
+        in: formData
+        name: nama_image
+        type: string
+      - description: Tanggal pemindaian (RFC3339)
+        in: formData
+        name: tanggal_pemindaian
+        type: string
+      - description: Deskripsi
+        in: formData
+        name: deskripsi
+        type: string
+      - description: Laporan hasil pemindaian
+        in: formData
+        name: laporan
+        type: string
+      - description: File gambar hasil scan
+        in: formData
+        name: gambar
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PemindaianXray'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Perbarui pemindaian xray
+      tags:
+      - PemindaianXray
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

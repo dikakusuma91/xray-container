@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  aplikasi:
+    build: .
+    container_name: app_xray
+    ports:
+      - "8181:8181"
+    volumes:
+      - gambar_xray:/app/repo-xray
+    environment:
+      DB_HOST: host.docker.internal
+
+volumes:
+  gambar_xray:
