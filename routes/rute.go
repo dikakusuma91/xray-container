@@ -22,10 +22,12 @@ func DaftarkanRute(router *gin.Engine, db *sql.DB, cfg *config.Konfigurasi) {
 	// Services
 	layananAuth := services.BuatLayananAuth(repoPengguna, cfg)
 	layananPemindaian := services.BuatLayananPemindaianXray(repoPemindaian)
+	layananDasbor := services.BuatLayananDasbor(repoPengguna, repoPemindaian)
 
 	// Controllers
 	pengendaliAuth := controllers.BuatPengendaliAuth(layananAuth)
 	pengendaliPemindaian := controllers.BuatPengendaliPemindaianXray(layananPemindaian, cfg)
+	pengendaliDasbor := controllers.BuatPengendaliDasbor(layananDasbor)
 
 	// Swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -38,13 +40,15 @@ func DaftarkanRute(router *gin.Engine, db *sql.DB, cfg *config.Konfigurasi) {
 	}
 
 	// Protected routes (JWT)
-	protected := router.Group("/api/v1/pemindaian-xray")
+	protected := router.Group("/api/v1")
 	protected.Use(middleware.PerantaraJWT(cfg))
 	{
-		protected.GET("", pengendaliPemindaian.AmbilSemua)
-		protected.GET("/:id", pengendaliPemindaian.AmbilBerdasarkanID)
-		protected.POST("", pengendaliPemindaian.BuatBaru)
-		protected.PUT("/:id", pengendaliPemindaian.Perbarui)
-		protected.DELETE("/:id", pengendaliPemindaian.Hapus)
+		protected.GET("/pemindaian-xray", pengendaliPemindaian.AmbilSemua)
+		protected.GET("/pemindaian-xray/:id", pengendaliPemindaian.AmbilBerdasarkanID)
+		protected.POST("/pemindaian-xray", pengendaliPemindaian.BuatBaru)
+		protected.PUT("/pemindaian-xray/:id", pengendaliPemindaian.Perbarui)
+		protected.DELETE("/pemindaian-xray/:id", pengendaliPemindaian.Hapus)
+
+		protected.GET("/dasbor/ringkasan", pengendaliDasbor.Ringkasan)
 	}
 }
